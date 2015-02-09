@@ -17,4 +17,6 @@ cabal-version:       >=1.8
 executable humus
   -- main-is:             
   -- other-modules:       
-  build-depends:       base ==4.6.*
+  build-depends:       
+    base >=4.6, 
+    aeson==0.8.*
