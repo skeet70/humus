@@ -1,21 +1,20 @@
 module Data.Humus (Card(..), 
     Color(..), 
-    ManaCost(..), 
+    ManaSymbol(..), 
     Printing(..), 
     fromName,
-    manaCostToInt,
     cardsToCurve) where
 
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Foldable(foldMap)
+import Data.List
 
 data Color = Blue | Black | Red | White | Green deriving (Show, Eq, Ord)
-data ManaCost = Colorless Int | Colored Color deriving (Show, Eq)
+data ManaSymbol = Colorless Int | Colored Color deriving (Show, Eq)
 data Printing = Alpha | Beta deriving (Show, Eq) --Obviously needs more members.
 data Card = Card {  name :: String,
                     colors :: [Color],
-                    manaCost :: [ManaCost], 
+                    manaCost :: [ManaSymbol], 
                     sets :: [Printing]    -- All sets the card was printed in
                   } deriving (Show, Eq)
 
@@ -31,12 +30,22 @@ type Curve = Map Int (Map Color Int)
 fromName :: String -> Either Error Card
 fromName = error "Not yet implemented"
 
-manaCostToInt :: ManaCost -> Int
-manaCostToInt (Colorless n) = n
-manaCostToInt _ = 1
+manaSymbolToInt :: ManaSymbol -> Int
+manaSymbolToInt (Colorless n) = n
+manaSymbolToInt _ = 1
+
+manaSymbolToColorMap :: ManaSymbol -> Map Color Int
+manaSymbolToColorMap (Colorless _) = Map.empty
+manaSymbolToColorMap (Colored c) = Map.singleton c 1
 
 cardsToCurve :: Deck -> Curve
-cardsToCurve = foldMap cardToCurve
+cardsToCurve = foldl' (Map.unionWith(sum2Maps))(Map.empty) . fmap cardToCurve
 
 cardToCurve :: Card -> Curve
-cardToCurve (Card _ myColors cost _) = Map.singleton (sum $ fmap manaCostToInt cost) (foldMap (flip Map.singleton 1) myColors)
+cardToCurve (Card _ _ cost _) = Map.singleton (sum $ fmap manaSymbolToInt cost) (sumMaps $ fmap manaSymbolToColorMap cost)
+
+sumMaps :: (Ord k, Num a) => [Map k a] -> Map k a
+sumMaps = foldl' (Map.unionWith(+))(Map.empty)
+
+sum2Maps :: (Ord k, Num a) => Map k a -> Map k a -> Map k a 
+sum2Maps first second = sumMaps [first, second]
