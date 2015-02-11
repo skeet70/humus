@@ -1,7 +1,7 @@
-module Data.Humus (Card(..), 
-    Color(..), 
-    ManaSymbol(..), 
-    Printing(..), 
+module Data.Humus (Card(..),
+    Color(..),
+    ManaSymbol(..),
+    Printing(..),
     fromName,
     cardsToCurve) where
 
@@ -14,7 +14,8 @@ data ManaSymbol = Colorless Int | Colored Color deriving (Show, Eq)
 data Printing = Alpha | Beta deriving (Show, Eq) --Obviously needs more members.
 data Card = Card {  name :: String,
                     colors :: [Color],
-                    manaCost :: [ManaSymbol], 
+                    manaCost :: [ManaSymbol],
+                    cmc :: Int,
                     sets :: [Printing]    -- All sets the card was printed in
                   } deriving (Show, Eq)
 
@@ -42,10 +43,13 @@ cardsToCurve :: Deck -> Curve
 cardsToCurve = foldl' (Map.unionWith(sum2Maps))(Map.empty) . fmap cardToCurve
 
 cardToCurve :: Card -> Curve
-cardToCurve (Card _ _ cost _) = Map.singleton (sum $ fmap manaSymbolToInt cost) (sumMaps $ fmap manaSymbolToColorMap cost)
+cardToCurve (Card _ _ cost _ _) = Map.singleton (sum $ fmap manaSymbolToInt cost) (sumMaps $ fmap manaSymbolToColorMap cost)
+
+deckToAvgCMC :: Deck -> Float
+deckToAvgCMC deck = 60 / ((foldl (+) 0.0) . fmap (fromIntegral . convertedManaCost)) deck
 
 sumMaps :: (Ord k, Num a) => [Map k a] -> Map k a
 sumMaps = foldl' (Map.unionWith(+))(Map.empty)
 
-sum2Maps :: (Ord k, Num a) => Map k a -> Map k a -> Map k a 
+sum2Maps :: (Ord k, Num a) => Map k a -> Map k a -> Map k a
 sum2Maps first second = sumMaps [first, second]
