@@ -1,16 +1,10 @@
-module Generator (
+module Humus.Generator (
   getLands,
   numLands,
 ) where
 
-import Data.Map (Map)
-import qualified Data.Map as Map
 
-import Data.Humus
-
-type Deck = [Card]
---Map of Cost -> Map (Color -> number of cards)
-type Curve = Map Int (Map Color Int)
+import Humus.Card
 
 -- Twin Exarch (Combo): 24/60, cmc 2.3
 -- Bloom Titan (Combo): 27/60, cmc 3.0
@@ -19,10 +13,13 @@ type Curve = Map Int (Map Color Int)
 -- U/B Control (Control): 25/60, cmc 3.86
 -- Sidisi Whip (Midrange): 23/60, cmc 3.59
 numLands :: Deck -> Curve -> Int
-numLands deck curve = undefined
+numLands = undefined
+--numLands deck curve = undefined
+
 
 getLands :: String -> Deck -> Curve -> [(Color, Float)] -> Deck
-getLands format deck curve distribution = undefined
+getLands = undefined
+--getLands format deck curve distribution = undefined
 
 -- Using that information we calculate how many lands they need. This is based
 -- off the mana curve and how color intensive their deck is. A low mana curve
