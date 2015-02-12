@@ -16,7 +16,7 @@ cabal-version:       >=1.8
 
 executable humus
   main-is: Main.hs
-  other-modules: Data.Humus
+  hs-source-dirs: src
   build-depends:
     base >=4.6,
     aeson==0.8.*,
