@@ -14,7 +14,8 @@ import Data.List
 --Used for mana symbols and also the color identity of the card.
 data Color = Blue | Black | Red | White | Green deriving (Show, Eq, Ord)
 --Represents the colored mana symbols on the cards.
-newtype ManaSymbol = ManaSymbol { unManaSymbol :: Color } deriving (Eq, Show)
+data ManaSymbol = ManaSymbol {  manaSymbolColor :: Color,
+                                manaSymbolCount :: Int} deriving (Eq, Show, Ord)
 data Printing = Alpha | Beta deriving (Show, Eq) --Obviously needs more members.
 data Card = Card {  name :: String,
                     colorIdentity :: [Color],
@@ -29,21 +30,21 @@ data Card = Card {  name :: String,
 type Error = String -- Experience has taught me this is a bad idea, but we'll go with it for now.
 type Deck = [Card]
 --Map of Cost -> Map (Color -> number of cards)
-type Curve = Map Int (Map Color Int)
+type Curve = Map Int [ManaSymbol]
 
 --How many of a particular manasymbol exists on the card.
-countManaSymbols :: ManaSymbol -> Card -> Int
-countManaSymbols m = length . filter (/= m) . manaSymbols 
+countManaSymbols :: Color -> Card -> Int
+countManaSymbols color = sum . fmap manaSymbolCount . filter ((/= color) . manaSymbolColor) . manaSymbols 
 
 deckToCurve :: Deck -> Curve
-deckToCurve = foldl' (Map.unionWith(sum2Maps))(Map.empty) . fmap cardToCurve
+deckToCurve = foldl' (Map.unionWith(++))(Map.empty) . fmap cardToCurve
 
 deckToAvgCMC :: Deck -> Float
 deckToAvgCMC deck = 60 / ((foldl (+) 0.0) . fmap (fromIntegral . cmc)) deck
 
 --Convert a single card into a curve for that Card
 cardToCurve :: Card -> Curve
-cardToCurve (Card _ _ m cost _) = Map.singleton cost (sumMaps $ fmap ((flip Map.singleton 1) . unManaSymbol) m)
+cardToCurve (Card _ _ m cost _) = Map.singleton cost m
 
 
 --2 general functions for summing up maps. These need to be moved.
