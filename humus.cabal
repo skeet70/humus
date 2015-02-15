@@ -20,4 +20,9 @@ executable humus
   build-depends:
     base >=4.6,
     aeson==0.8.*,
-    containers==0.5.5.*
+    containers==0.5.5.*,
+    text==1.2.0.4,
+    bytestring==0.10.4.0,
+    split==0.2.2,
+    either==4.3.3.*,
+    transformers >= 0.2 && < 0.5

@@ -1,10 +1,8 @@
-module Humus.Card (Card(..),
+module Humus.Card (Card(..), Land(..),
     Color(..),
     ManaSymbol(..),
-    Printing(..),
     Deck,
     Curve,
-    fromName,
     deckToCurve,
     countManaSymbols,
     deckToAvgCMC) where
@@ -17,18 +15,20 @@ import Data.List
 data Color = Blue | Black | Red | White | Green deriving (Show, Eq, Ord)
 --Represents the colored mana symbols on the cards.
 newtype ManaSymbol = ManaSymbol { unManaSymbol :: Color } deriving (Eq, Show)
-data Printing = Alpha | Beta deriving (Show, Eq) --Obviously needs more members.
-data Card = Card {  name :: String,
-                    colorIdentity :: [Color],
-                    manaSymbols :: [ManaSymbol], 
-                    cmc :: Int,
-                    sets :: [Printing]    -- All sets the card was printed in
-                  } deriving (Show, Eq)
+data Format = Vintage | Legacy | Modern | Standard deriving (Eq, Show)
+data Legal = Banned | Restricted | Legal deriving (Eq, Show)
+data Card = Card { name :: String,
+                     manaSymbols :: [ManaSymbol],
+                     cmc :: Int,
+                     colorIdentity :: [Color]
+                     --legalities :: M.Map String String
+                   } deriving (Show, Eq)
 
+data Land = Land { _name :: String,
+                     _type :: String
+                     --legalities :: M.Map String String
+                   } deriving (Show, Eq)
 
-
-
-type Error = String -- Experience has taught me this is a bad idea, but we'll go with it for now.
 type Deck = [Card]
 --Map of Cost -> Map (Color -> number of cards)
 type Curve = Map Int (Map Color Int)
@@ -43,9 +43,9 @@ deckToCurve = foldl' (Map.unionWith(sum2Maps))(Map.empty) . fmap cardToCurve
 deckToAvgCMC :: Deck -> Float
 deckToAvgCMC deck = 60 / ((foldl (+) 0.0) . fmap (fromIntegral . cmc)) deck
 
---Convert a single card into a curve for that Card
+----Convert a single card into a curve for that Card
 cardToCurve :: Card -> Curve
-cardToCurve (Card _ _ m cost _) = Map.singleton cost (sumMaps $ fmap ((flip Map.singleton 1) . unManaSymbol) m)
+cardToCurve (Card _ m cost _) = Map.singleton cost (sumMaps $ fmap ((flip Map.singleton 1) . unManaSymbol) m)
 
 
 --2 general functions for summing up maps. These need to be moved.
@@ -55,7 +55,3 @@ sumMaps = foldl' (Map.unionWith(+))(Map.empty)
 sum2Maps :: (Ord k, Num a) => Map k a -> Map k a -> Map k a
 sum2Maps first second = sumMaps [first, second]
 
-
---Parsing stuff goes below here
-fromName :: String -> Either Error Card
-fromName = error "Not yet implemented"
