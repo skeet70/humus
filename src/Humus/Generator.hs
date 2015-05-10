@@ -12,6 +12,11 @@ import Humus.Card
 -- Abzan (Midrange): 24/60, cmc 3.47
 -- U/B Control (Control): 25/60, cmc 3.86
 -- Sidisi Whip (Midrange): 23/60, cmc 3.59
+-- Expectation:
+--    (m*n)/60
+-- is the number of lands in a average 7 card hand. For Modern this looks to be
+-- about .5 over the average CMC for the deck, and for Standard it looks like
+-- it's about 1 under.
 numLands :: Deck -> Curve -> Int
 numLands = undefined
 --numLands deck curve = undefined
